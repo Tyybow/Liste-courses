@@ -3,14 +3,17 @@ import { useStore } from '../../store/useStore';
 import type { Recipe, Difficulty } from '../../types';
 import { RECIPE_CATEGORIES } from '../../types';
 import RecipeForm from './RecipeForm';
+import RecipeImport from './RecipeImport';
 
 export default function RecipeList() {
   const { recipes, ingredients, deleteRecipe } = useStore();
   const [showForm, setShowForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('');
+  const [importSuccess, setImportSuccess] = useState(false);
 
   const filtered = recipes
     .filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
@@ -40,13 +43,36 @@ export default function RecipeList() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">Recettes ({recipes.length})</h2>
-        <button
-          onClick={() => { setShowForm(true); setEditingRecipe(null); }}
-          className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors cursor-pointer"
-        >
-          + Nouvelle recette
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => { setShowImport(true); setShowForm(false); }}
+            className="bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            Importer (URL)
+          </button>
+          <button
+            onClick={() => { setShowForm(true); setShowImport(false); setEditingRecipe(null); }}
+            className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors cursor-pointer"
+          >
+            + Nouvelle recette
+          </button>
+        </div>
       </div>
+
+      {/* Success message */}
+      {importSuccess && (
+        <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-between">
+          <span>Recette importée avec succès !</span>
+          <button onClick={() => setImportSuccess(false)} className="text-green-500 hover:text-green-700 cursor-pointer">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Filtres */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -68,6 +94,14 @@ export default function RecipeList() {
           ))}
         </select>
       </div>
+
+      {/* Import */}
+      {showImport && (
+        <RecipeImport
+          onClose={() => setShowImport(false)}
+          onImported={() => { setImportSuccess(true); setTimeout(() => setImportSuccess(false), 5000); }}
+        />
+      )}
 
       {/* Formulaire */}
       {showForm && (

@@ -203,16 +203,8 @@ export const useStore = create<AppState>()(
             inStock: false,
             purchased: false,
           })),
-          manualShoppingItems: state.manualShoppingItems.map((item) => ({
-            ...item,
-            inStock: false,
-            purchased: false,
-          })),
-          shoppingNonFood: state.shoppingNonFood.map((item) => ({
-            ...item,
-            inStock: false,
-            purchased: false,
-          })),
+          manualShoppingItems: [],
+          shoppingNonFood: [],
         })),
 
       // --- Non-food items ---
