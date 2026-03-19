@@ -135,6 +135,7 @@ function extractJsonLd(rawHtml: string): any | null {
   // Decode HTML entities first (Marmiton encodes type="application&#x2F;ld&#x2B;json")
   const html = decodeHtmlEntities(rawHtml);
 
+  // Method 1: Find JSON-LD script tags
   const patterns = [
     /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
     /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis,
@@ -143,35 +144,87 @@ function extractJsonLd(rawHtml: string): any | null {
   for (const pattern of patterns) {
     let match;
     while ((match = pattern.exec(html)) !== null) {
-      try {
-        const jsonContent = match[1].trim();
-        const parsed = JSON.parse(jsonContent);
-
-        // Direct Recipe object
-        if (parsed['@type'] === 'Recipe') return parsed;
-        if (Array.isArray(parsed['@type']) && parsed['@type'].includes('Recipe')) return parsed;
-
-        // Array of objects
-        if (Array.isArray(parsed)) {
-          const recipe = parsed.find((item: any) =>
-            item['@type'] === 'Recipe' ||
-            (Array.isArray(item['@type']) && item['@type'].includes('Recipe'))
-          );
-          if (recipe) return recipe;
-        }
-
-        // @graph array
-        if (parsed['@graph'] && Array.isArray(parsed['@graph'])) {
-          const recipe = parsed['@graph'].find((item: any) =>
-            item['@type'] === 'Recipe' ||
-            (Array.isArray(item['@type']) && item['@type'].includes('Recipe'))
-          );
-          if (recipe) return recipe;
-        }
-      } catch {
-        // Skip invalid JSON, continue trying
-      }
+      const found = parseRecipeFromJson(match[1].trim());
+      if (found) return found;
     }
+  }
+
+  // Method 2: Direct search for {"@type":"Recipe"...} anywhere in the HTML
+  // This handles cases where JSON-LD is embedded in JS or other structures
+  const recipeJsonMatch = html.match(/\{"@(?:context|type)"\s*:\s*"[^"]*"[^}]*"@type"\s*:\s*"Recipe"[^]*?"recipeIngredient"\s*:\s*\[[^\]]*\][^]*?\}/);
+  if (recipeJsonMatch) {
+    const found = parseRecipeFromJson(recipeJsonMatch[0]);
+    if (found) return found;
+  }
+
+  // Method 3: Find recipeIngredient array and build recipe data from surrounding JSON
+  const ingredientMatch = html.match(/"recipeIngredient"\s*:\s*\[([^\]]+)\]/);
+  if (ingredientMatch) {
+    // Try to find the enclosing Recipe object by looking backwards for @type:Recipe
+    const pos = html.indexOf(ingredientMatch[0]);
+    // Search a window around the match for a complete Recipe JSON
+    const windowStart = Math.max(0, pos - 2000);
+    const windowEnd = Math.min(html.length, pos + 5000);
+    const window = html.slice(windowStart, windowEnd);
+
+    // Extract key fields with individual regex
+    const nameMatch = window.match(/"name"\s*:\s*"([^"]+)"/);
+    const prepMatch = window.match(/"prepTime"\s*:\s*"([^"]+)"/);
+    const cookMatch = window.match(/"cookTime"\s*:\s*"([^"]+)"/);
+    const yieldMatch = window.match(/"recipeYield"\s*:\s*"([^"]+)"/);
+    const instrMatch = window.match(/"recipeInstructions"\s*:\s*(\[[\s\S]*?\])\s*,\s*"/);
+
+    const ingredients: string[] = [];
+    try {
+      const parsed = JSON.parse('[' + ingredientMatch[1] + ']');
+      ingredients.push(...parsed);
+    } catch { /* ignore */ }
+
+    if (ingredients.length > 0) {
+      let instructions: any[] = [];
+      if (instrMatch) {
+        try { instructions = JSON.parse(instrMatch[1]); } catch { /* ignore */ }
+      }
+
+      return {
+        '@type': 'Recipe',
+        name: nameMatch?.[1] || 'Recette importée',
+        prepTime: prepMatch?.[1] || '',
+        cookTime: cookMatch?.[1] || '',
+        recipeYield: yieldMatch?.[1] || '4',
+        recipeIngredient: ingredients,
+        recipeInstructions: instructions,
+      };
+    }
+  }
+
+  return null;
+}
+
+function parseRecipeFromJson(jsonStr: string): any | null {
+  try {
+    const parsed = JSON.parse(jsonStr);
+
+    if (parsed['@type'] === 'Recipe') return parsed;
+    if (Array.isArray(parsed['@type']) && parsed['@type'].includes('Recipe')) return parsed;
+
+    if (Array.isArray(parsed)) {
+      const recipe = parsed.find((item: any) =>
+        item['@type'] === 'Recipe' ||
+        (Array.isArray(item['@type']) && item['@type'].includes('Recipe'))
+      );
+      if (recipe) return recipe;
+    }
+
+    if (parsed['@graph'] && Array.isArray(parsed['@graph'])) {
+      const recipe = parsed['@graph'].find((item: any) =>
+        item['@type'] === 'Recipe' ||
+        (Array.isArray(item['@type']) && item['@type'].includes('Recipe'))
+      );
+      if (recipe) return recipe;
+    }
+  } catch {
+    // Not valid JSON
   }
   return null;
 }
