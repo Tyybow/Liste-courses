@@ -236,6 +236,18 @@ export default function RecipeImport({ onClose, onImported }: { onClose: () => v
               {error}
             </div>
           )}
+          {/* Supported sites */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+            <span className="font-medium text-gray-500">Sites compatibles :</span>
+            <span>Marmiton</span>
+            <span>750g</span>
+            <span>CuisineAZ</span>
+            <span>Ptitchef</span>
+            <span>Journal des Femmes</span>
+            <span>Hervé Cuisine</span>
+            <span>Ricardo</span>
+            <span className="italic">et tout site avec données structurées</span>
+          </div>
           <div className="flex gap-2">
             <button
               type="button"
