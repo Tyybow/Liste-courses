@@ -8,7 +8,7 @@ type AddMode = null | 'food' | 'nonfood';
 
 export default function ShoppingList() {
   const {
-    shoppingList, ingredients, meals, manualShoppingItems,
+    shoppingList, ingredients, manualShoppingItems,
     toggleInStock, togglePurchased, resetShoppingList,
     addIngredient, addManualFoodToShopping, removeManualFoodFromShopping,
     nonFoodItems, shoppingNonFood,
