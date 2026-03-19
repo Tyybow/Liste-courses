@@ -115,9 +115,26 @@ function parseIngredientString(raw: string): ScrapedIngredient {
   return { name, quantity, unit, raw: cleaned };
 }
 
+// Decode HTML entities in the raw HTML so JSON-LD type attributes are normalised
+function decodeHtmlEntities(html: string): string {
+  return html
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&#x2B;/gi, '+')
+    .replace(/&#x3A;/gi, ':')
+    .replace(/&#x22;/gi, '"')
+    .replace(/&#x27;/gi, "'")
+    .replace(/&#39;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+}
+
 // Try to find JSON-LD Recipe data in HTML
-function extractJsonLd(html: string): any | null {
-  // Try multiple regex patterns for JSON-LD extraction
+function extractJsonLd(rawHtml: string): any | null {
+  // Decode HTML entities first (Marmiton encodes type="application&#x2F;ld&#x2B;json")
+  const html = decodeHtmlEntities(rawHtml);
+
   const patterns = [
     /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
     /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis,
