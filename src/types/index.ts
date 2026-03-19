@@ -90,3 +90,42 @@ export interface ShoppingItem {
   inStock: boolean;
   purchased: boolean;
 }
+
+export interface ManualShoppingItem {
+  ingredientId: string;
+  quantity: number;
+  unit: Unit;
+  inStock: boolean;
+  purchased: boolean;
+}
+
+// --- Non-comestibles ---
+
+export type NonFoodCategory =
+  | 'Hygiène & Beauté'
+  | 'Ménage & Entretien'
+  | 'Papeterie'
+  | 'Bébé'
+  | 'Animaux'
+  | 'Autre';
+
+export const NON_FOOD_CATEGORIES: NonFoodCategory[] = [
+  'Hygiène & Beauté',
+  'Ménage & Entretien',
+  'Papeterie',
+  'Bébé',
+  'Animaux',
+  'Autre',
+];
+
+export interface NonFoodItem {
+  id: string;
+  name: string;
+  category: NonFoodCategory;
+}
+
+export interface ShoppingNonFoodItem {
+  nonFoodItemId: string;
+  inStock: boolean;
+  purchased: boolean;
+}
