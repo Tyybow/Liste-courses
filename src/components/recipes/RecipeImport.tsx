@@ -105,7 +105,11 @@ export default function RecipeImport({ onClose, onImported }: { onClose: () => v
       }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Erreur lors du scraping');
+        let msg = data.error || 'Erreur lors du scraping';
+        if (data.debug) {
+          msg += ` (page: "${data.debug.pageTitle}", JSON-LD: ${data.debug.hasJsonLd ? 'oui' : 'non'}, taille: ${data.debug.htmlLength})`;
+        }
+        throw new Error(msg);
       }
 
       const recipe = data as ScrapedRecipe;
