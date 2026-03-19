@@ -14,6 +14,19 @@ export default function IngredientList() {
     category: 'Autre',
     defaultUnit: 'g',
   });
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
 
   const filtered = ingredients
     .filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
@@ -133,26 +146,42 @@ export default function IngredientList() {
         <p className="text-gray-500 text-sm text-center py-8">Aucun ingrédient trouvé.</p>
       ) : (
         Object.entries(grouped).map(([category, items]) => (
-          <div key={category}>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">{category}</h3>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
-              {items.map((ing) => (
-                <div key={ing.id} className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <span className="font-medium text-gray-800">{ing.name}</span>
-                    <span className="ml-2 text-xs text-gray-400">({ing.defaultUnit})</span>
+          <div key={category} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <button
+              onClick={() => toggleCategory(category)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider">{category}</h3>
+                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{items.length}</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${expandedCategories.has(category) ? 'rotate-180' : ''}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {expandedCategories.has(category) && (
+              <div className="divide-y divide-gray-100 border-t border-gray-100">
+                {items.map((ing) => (
+                  <div key={ing.id} className="flex items-center justify-between px-4 py-3">
+                    <div>
+                      <span className="font-medium text-gray-800">{ing.name}</span>
+                      <span className="ml-2 text-xs text-gray-400">({ing.defaultUnit})</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEdit(ing)}
+                        className="text-xs text-primary hover:text-primary-dark cursor-pointer"
+                      >
+                        Modifier
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => startEdit(ing)}
-                      className="text-xs text-primary hover:text-primary-dark cursor-pointer"
-                    >
-                      Modifier
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         ))
       )}
