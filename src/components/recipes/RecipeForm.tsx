@@ -166,8 +166,8 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-4">
-      <h3 className="font-bold text-gray-800">{recipe ? 'Modifier la recette' : 'Nouvelle recette'}</h3>
+    <form onSubmit={handleSubmit} className="card-glass rounded-2xl border border-gray-200/60 p-5 space-y-5 animate-fade-in">
+      <h3 className="font-bold text-gray-800 text-lg">{recipe ? 'Modifier la recette' : 'Nouvelle recette'}</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <input
@@ -175,14 +175,14 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
           placeholder="Nom de la recette"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
           required
           autoFocus
         />
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as RecipeCategory)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
         >
           {RECIPE_CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -192,31 +192,31 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Prépa (min)</label>
+          <label className="text-xs font-medium text-gray-400 mb-1.5 block">Prépa (min)</label>
           <input
             type="number"
             min={0}
             value={prepTime}
             onChange={(e) => setPrepTime(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
           />
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Cuisson (min)</label>
+          <label className="text-xs font-medium text-gray-400 mb-1.5 block">Cuisson (min)</label>
           <input
             type="number"
             min={0}
             value={cookTime}
             onChange={(e) => setCookTime(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
           />
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Difficulté</label>
+          <label className="text-xs font-medium text-gray-400 mb-1.5 block">Difficulté</label>
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
           >
             <option value="Facile">Facile</option>
             <option value="Moyen">Moyen</option>
@@ -226,29 +226,29 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
       </div>
 
       <div>
-        <label className="text-xs text-gray-500 mb-1 block">Instructions</label>
+        <label className="text-xs font-medium text-gray-400 mb-1.5 block">Instructions</label>
         <textarea
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
           rows={4}
           placeholder="Décrivez les étapes de préparation..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y"
+          className="w-full px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all resize-y"
         />
       </div>
 
       {/* Ingrédients de la recette */}
       <div>
-        <label className="text-xs text-gray-500 mb-2 block">Ingrédients (pour 2 personnes)</label>
+        <label className="text-xs font-medium text-gray-400 mb-2 block">Ingrédients (pour 2 personnes)</label>
 
         {recipeIngredients.length > 0 && (
-          <ul className="space-y-1 mb-3">
+          <ul className="space-y-1.5 mb-3">
             {recipeIngredients.map((ri) => (
-              <li key={ri.ingredientId} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm">
-                <span>{ri.quantity} {ri.unit} {getIngredientName(ri.ingredientId)}</span>
+              <li key={ri.ingredientId} className="flex items-center justify-between bg-gradient-to-r from-primary/6 to-primary/3 px-3.5 py-2.5 rounded-xl text-sm border border-primary/10">
+                <span className="font-medium text-gray-700">{ri.quantity} {ri.unit} {getIngredientName(ri.ingredientId)}</span>
                 <button
                   type="button"
                   onClick={() => removeIngredientLine(ri.ingredientId)}
-                  className="text-danger hover:text-red-700 text-xs cursor-pointer"
+                  className="text-gray-400 hover:text-danger text-xs cursor-pointer font-medium transition-colors"
                 >
                   Retirer
                 </button>
@@ -272,19 +272,19 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
               }}
               onFocus={() => ingSearch.trim() && setShowSuggestions(true)}
               onKeyDown={handleKeyDown}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
             />
             {showSuggestions && ingSearch.trim() && (suggestions.length > 0 || canCreateNew) && (
               <div
                 ref={suggestionsRef}
-                className="absolute z-10 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                className="absolute z-10 left-0 right-0 top-full mt-1 bg-white border border-gray-200/60 rounded-xl shadow-lg max-h-48 overflow-y-auto"
               >
                 {suggestions.map((ing, idx) => (
                   <button
                     key={ing.id}
                     type="button"
                     onClick={() => selectIngredient(ing.id)}
-                    className={`w-full text-left px-3 py-2 text-sm cursor-pointer transition-colors ${
+                    className={`w-full text-left px-3.5 py-2.5 text-sm cursor-pointer transition-colors ${
                       idx === highlightedIndex
                         ? 'bg-primary/10 text-primary'
                         : 'hover:bg-gray-50 text-gray-700'
@@ -300,7 +300,7 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
                     onClick={() => {
                       setShowSuggestions(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-primary/5 cursor-pointer border-t border-gray-100"
+                    className="w-full text-left px-3.5 py-2.5 text-sm text-primary font-medium hover:bg-primary/5 cursor-pointer border-t border-gray-100"
                   >
                     + Créer « {ingSearch.trim()} »
                   </button>
@@ -315,12 +315,12 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
             placeholder="Qté"
             value={selectedQty || ''}
             onChange={(e) => setSelectedQty(Number(e.target.value))}
-            className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-20 px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
           <select
             value={selectedUnit}
             onChange={(e) => setSelectedUnit(e.target.value as Unit)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="px-3 py-2.5 bg-white/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           >
             {UNITS.map((u) => (
               <option key={u} value={u}>{u}</option>
@@ -329,7 +329,7 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
           <button
             type="button"
             onClick={addIngredientLine}
-            className="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors cursor-pointer"
+            className="btn-gradient text-white px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer"
           >
             +
           </button>
@@ -341,17 +341,17 @@ export default function RecipeForm({ recipe, onClose }: RecipeFormProps) {
         )}
       </div>
 
-      <div className="flex gap-2 pt-2">
+      <div className="flex gap-2 pt-3 border-t border-gray-100/60">
         <button
           type="submit"
-          className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors cursor-pointer"
+          className="btn-gradient text-white px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer"
         >
           {recipe ? 'Enregistrer' : 'Créer la recette'}
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+          className="px-5 py-2.5 rounded-xl text-sm text-gray-500 hover:bg-gray-100/80 transition-colors cursor-pointer font-medium"
         >
           Annuler
         </button>

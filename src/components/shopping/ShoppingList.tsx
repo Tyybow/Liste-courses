@@ -225,22 +225,25 @@ export default function ShoppingList() {
   const hasAnything = mergedFoodItems.length > 0 || shoppingNonFood.length > 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-800">Liste de courses</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Courses</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Votre liste d'achats</p>
+        </div>
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setAddMode(addMode === 'food' ? null : 'food')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-              addMode === 'food' ? 'bg-primary-dark text-white' : 'bg-primary text-white hover:bg-primary-dark'
+            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+              addMode === 'food' ? 'btn-gradient text-white shadow-md' : 'btn-gradient text-white shadow-sm'
             }`}
           >
             + Comestible
           </button>
           <button
             onClick={() => setAddMode(addMode === 'nonfood' ? null : 'nonfood')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-              addMode === 'nonfood' ? 'bg-primary-dark text-white' : 'bg-primary text-white hover:bg-primary-dark'
+            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+              addMode === 'nonfood' ? 'btn-gradient-accent text-white shadow-md' : 'btn-gradient-accent text-white shadow-sm'
             }`}
           >
             + Non-comestible
@@ -248,7 +251,7 @@ export default function ShoppingList() {
           {totalItems > 0 && (
             <button
               onClick={resetShoppingList}
-              className="text-sm text-gray-500 hover:text-gray-700 font-medium cursor-pointer px-3 py-2"
+              className="text-sm text-gray-400 hover:text-danger font-medium cursor-pointer px-3 py-2 rounded-xl hover:bg-danger-light transition-colors"
             >
               Réinitialiser
             </button>
@@ -258,7 +261,7 @@ export default function ShoppingList() {
 
       {/* Ajout comestible */}
       {addMode === 'food' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3">
+        <div className="card-glass rounded-2xl border border-gray-200/60 p-4 space-y-3 animate-fade-in">
           <h3 className="font-semibold text-gray-700 text-sm">Ajouter un article comestible</h3>
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
@@ -333,7 +336,7 @@ export default function ShoppingList() {
 
       {/* Ajout non-comestible */}
       {addMode === 'nonfood' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3">
+        <div className="card-glass rounded-2xl border border-gray-200/60 p-4 space-y-3 animate-fade-in">
           <h3 className="font-semibold text-gray-700 text-sm">Ajouter un article non-comestible</h3>
           <div className="relative">
             <input
@@ -381,9 +384,10 @@ export default function ShoppingList() {
       )}
 
       {!hasAnything && addMode === null && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-6 py-12 text-center">
-          <p className="text-gray-400 text-lg mb-2">🛒</p>
-          <p className="text-gray-500">Ajoutez des repas dans le planning ou des articles manuellement.</p>
+        <div className="card-glass rounded-2xl border border-gray-200/60 px-6 py-16 text-center">
+          <div className="text-4xl mb-3">🛒</div>
+          <p className="text-gray-400 font-medium">Votre liste est vide</p>
+          <p className="text-gray-300 text-sm mt-1">Ajoutez des repas dans le planning ou des articles manuellement.</p>
         </div>
       )}
 
@@ -391,22 +395,22 @@ export default function ShoppingList() {
         <>
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 text-center">
+            <div className="card-glass stat-card stat-card-primary rounded-2xl border border-gray-200/60 px-4 py-4 text-center">
               <p className="text-2xl font-bold text-primary">{activeCount}</p>
-              <p className="text-xs text-gray-400">À acheter</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">À acheter</p>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 text-center">
+            <div className="card-glass stat-card stat-card-accent rounded-2xl border border-gray-200/60 px-4 py-4 text-center">
               <p className="text-2xl font-bold text-accent">{inStockCount}</p>
-              <p className="text-xs text-gray-400">En stock</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">En stock</p>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 text-center">
+            <div className="card-glass stat-card stat-card-success rounded-2xl border border-gray-200/60 px-4 py-4 text-center">
               <p className="text-2xl font-bold text-success">{purchasedCount}</p>
-              <p className="text-xs text-gray-400">Achetés</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">Achetés</p>
             </div>
           </div>
 
           {/* Filtres */}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 bg-gray-100/80 p-1 rounded-xl w-fit">
             {([
               { key: 'active', label: 'À acheter' },
               { key: 'all', label: 'Tout' },
@@ -415,10 +419,10 @@ export default function ShoppingList() {
               <button
                 key={f.key}
                 onClick={() => setFilterMode(f.key)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   filterMode === f.key
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {f.label}
@@ -443,7 +447,7 @@ export default function ShoppingList() {
                   <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
                     {getFoodCategoryIcon(category)} {category}
                   </h3>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
+                  <div className="card-glass rounded-2xl border border-gray-200/60 divide-y divide-gray-100/60">
                     {groupedFood[category].map((item) => {
                       const key = `${item.ingredientId}_${item.unit}`;
                       const isStandalone = standaloneManualKeys.has(key);
@@ -509,7 +513,7 @@ export default function ShoppingList() {
                   <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
                     {getNonFoodCategoryIcon(category)} {category}
                   </h3>
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
+                  <div className="card-glass rounded-2xl border border-gray-200/60 divide-y divide-gray-100/60">
                     {groupedNonFood[category].map((item) => (
                       <div
                         key={item.nonFoodItemId}

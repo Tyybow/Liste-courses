@@ -30,56 +30,86 @@ export default function WeekPlanning() {
 
   const sortedRecipes = [...recipes].sort((a, b) => a.name.localeCompare(b.name));
 
+  const dayColors = [
+    'from-violet-500/10 to-violet-500/5',
+    'from-blue-500/10 to-blue-500/5',
+    'from-cyan-500/10 to-cyan-500/5',
+    'from-emerald-500/10 to-emerald-500/5',
+    'from-amber-500/10 to-amber-500/5',
+    'from-orange-500/10 to-orange-500/5',
+    'from-rose-500/10 to-rose-500/5',
+  ];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-800">Planning de la semaine</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Planning</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Organisez vos repas de la semaine</p>
+        </div>
         {meals.length > 0 && (
           <button
             onClick={clearPlanning}
-            className="text-sm text-danger hover:text-red-700 font-medium cursor-pointer"
+            className="text-sm text-gray-400 hover:text-danger font-medium cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-danger-light transition-colors"
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
             Vider le planning
           </button>
         )}
       </div>
 
       {recipes.length === 0 && (
-        <p className="text-sm text-gray-500 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 flex items-center gap-2">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
           Ajoutez d'abord des recettes avant de planifier vos repas.
-        </p>
+        </div>
       )}
 
       {/* Vue calendrier */}
       <div className="space-y-3">
-        {DAYS_OF_WEEK.map((day) => (
-          <div key={day} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-700">{day}</h3>
+        {DAYS_OF_WEEK.map((day, dayIdx) => (
+          <div key={day} className="card-glass rounded-2xl border border-gray-200/60 overflow-hidden hover-lift">
+            <div className={`bg-gradient-to-r ${dayColors[dayIdx]} px-5 py-3 border-b border-gray-100/60`}>
+              <h3 className="font-bold text-gray-700">{day}</h3>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100/60">
               {(['midi', 'soir'] as MealTime[]).map((time) => {
                 const slotMeals = getMeals(day, time);
                 const isAdding = addingSlot?.day === day && addingSlot?.time === time;
 
                 return (
-                  <div key={time} className="px-4 py-3 min-h-[80px]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-gray-400 uppercase">{time === 'midi' ? '☀️ Midi' : '🌙 Soir'}</span>
+                  <div key={time} className="px-5 py-4 min-h-[90px]">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        {time === 'midi' ? (
+                          <span className="text-amber-400">☀️</span>
+                        ) : (
+                          <span className="text-indigo-400">🌙</span>
+                        )}
+                        {time === 'midi' ? 'Midi' : 'Soir'}
+                      </span>
                       <button
                         onClick={() => {
                           setAddingSlot(isAdding ? null : { day, time });
                           setSelectedRecipeId('');
                           setServings(2);
                         }}
-                        className="text-xs text-primary hover:text-primary-dark font-medium cursor-pointer"
+                        className={`text-xs font-medium cursor-pointer px-2.5 py-1 rounded-lg transition-all ${
+                          isAdding
+                            ? 'text-gray-500 bg-gray-100'
+                            : 'text-primary hover:bg-primary/8'
+                        }`}
                       >
                         {isAdding ? 'Annuler' : '+ Ajouter'}
                       </button>
                     </div>
 
                     {slotMeals.map((meal) => (
-                      <div key={meal.id} className="flex items-center justify-between bg-primary/5 rounded-lg px-3 py-2 mb-2">
+                      <div key={meal.id} className="flex items-center justify-between bg-gradient-to-r from-primary/6 to-primary/3 rounded-xl px-3.5 py-2.5 mb-2 border border-primary/10">
                         <div>
                           <span className="text-sm font-medium text-gray-800">{getRecipeName(meal.recipeId)}</span>
                           <span className="text-xs text-gray-400 ml-2">{meal.servings} pers.</span>
@@ -88,7 +118,7 @@ export default function WeekPlanning() {
                           <select
                             value={meal.servings}
                             onChange={(e) => updateMeal(meal.id, { servings: Number(e.target.value) })}
-                            className="text-xs border border-gray-300 rounded px-1 py-0.5 focus:outline-none"
+                            className="text-xs border border-gray-200 rounded-lg px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-primary/20 bg-white"
                           >
                             {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                               <option key={n} value={n}>{n} pers.</option>
@@ -96,7 +126,7 @@ export default function WeekPlanning() {
                           </select>
                           <button
                             onClick={() => deleteMeal(meal.id)}
-                            className="text-danger hover:text-red-700 cursor-pointer"
+                            className="text-gray-300 hover:text-danger cursor-pointer transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -107,11 +137,11 @@ export default function WeekPlanning() {
                     ))}
 
                     {isAdding && (
-                      <div className="space-y-2 bg-gray-50 rounded-lg p-3">
+                      <div className="space-y-2 bg-gray-50/80 rounded-xl p-3 border border-gray-100 animate-fade-in">
                         <select
                           value={selectedRecipeId}
                           onChange={(e) => setSelectedRecipeId(e.target.value)}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white"
                           autoFocus
                         >
                           <option value="">Choisir une recette...</option>
@@ -123,7 +153,7 @@ export default function WeekPlanning() {
                           <select
                             value={servings}
                             onChange={(e) => setServings(Number(e.target.value))}
-                            className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+                            className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none bg-white"
                           >
                             {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                               <option key={n} value={n}>{n} pers.</option>
@@ -132,7 +162,7 @@ export default function WeekPlanning() {
                           <button
                             onClick={handleAdd}
                             disabled={!selectedRecipeId}
-                            className="flex-1 bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                            className="flex-1 btn-gradient text-white px-3 py-2 rounded-xl text-sm font-medium disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
                           >
                             Ajouter
                           </button>
