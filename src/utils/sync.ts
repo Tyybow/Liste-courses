@@ -33,19 +33,19 @@ export interface SyncData {
 }
 
 export async function loadFromCloud(roomCode: string): Promise<SyncData | null> {
+  const res = await fetch(`/api/sync?room=${encodeURIComponent(roomCode)}`);
+  if (res.status === 404) return null;
+  const text = await res.text();
+  let json;
   try {
-    const res = await fetch(`/api/sync?room=${encodeURIComponent(roomCode)}`);
-    if (res.status === 404) return null;
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Erreur de chargement');
-    }
-    const { data } = await res.json();
-    return data as SyncData;
-  } catch (err) {
-    console.error('Erreur chargement cloud:', err);
-    throw err;
+    json = JSON.parse(text);
+  } catch {
+    throw new Error(`Réponse invalide du serveur (${res.status})`);
   }
+  if (!res.ok) {
+    throw new Error(json.error || `Erreur serveur (${res.status})`);
+  }
+  return json.data as SyncData;
 }
 
 export async function saveToCloud(roomCode: string, data: SyncData): Promise<void> {

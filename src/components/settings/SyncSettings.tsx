@@ -53,8 +53,9 @@ export default function SyncSettings() {
       };
       await saveToCloud(code, data);
       showMessage('Code créé et données synchronisées !', 'success');
-    } catch {
-      showMessage('Erreur lors de la synchronisation', 'error');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la synchronisation';
+      showMessage(msg, 'error');
     }
   };
 
@@ -77,8 +78,9 @@ export default function SyncSettings() {
       store.loadFromCloudData(data);
       setInputCode('');
       showMessage('Données chargées avec succès !', 'success');
-    } catch {
-      showMessage('Erreur de connexion', 'error');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erreur de connexion';
+      showMessage(msg, 'error');
     }
   };
 
