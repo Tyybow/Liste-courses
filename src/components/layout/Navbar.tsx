@@ -1,5 +1,7 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useStore } from '../../store/useStore';
+import { getRoomCode, loadFromCloud } from '../../utils/sync';
 
 export type Tab = 'recipes' | 'planning' | 'shopping' | 'settings';
 
@@ -40,6 +42,26 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
 
 export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const store = useStore();
+
+  const handleRefresh = useCallback(async () => {
+    const roomCode = getRoomCode();
+    if (roomCode) {
+      setSyncing(true);
+      try {
+        const data = await loadFromCloud(roomCode);
+        if (data) store.loadFromCloudData(data);
+      } catch {
+        // fallback: reload page
+        window.location.reload();
+      } finally {
+        setSyncing(false);
+      }
+    } else {
+      window.location.reload();
+    }
+  }, [store]);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/20" style={{
@@ -70,6 +92,15 @@ export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
               </button>
             ))}
             <button
+              onClick={handleRefresh}
+              className="p-2.5 rounded-xl transition-all duration-200 cursor-pointer ml-1 text-white/70 hover:bg-white/15 hover:text-white"
+              title="Actualiser"
+            >
+              <svg className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button
               onClick={() => onTabChange('settings')}
               className={`p-2.5 rounded-xl transition-all duration-200 cursor-pointer ml-1 ${
                 activeTab === 'settings'
@@ -85,19 +116,30 @@ export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
             </button>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-xl text-white/80 hover:bg-white/15 cursor-pointer transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          {/* Mobile: refresh + menu buttons */}
+          <div className="md:hidden flex items-center gap-1">
+            <button
+              className="p-2 rounded-xl text-white/80 hover:bg-white/15 cursor-pointer transition-colors"
+              onClick={handleRefresh}
+              title="Actualiser"
+            >
+              <svg className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button
+              className="p-2 rounded-xl text-white/80 hover:bg-white/15 cursor-pointer transition-colors"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {menuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Mobile nav */}
