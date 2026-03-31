@@ -5,6 +5,8 @@ import type { Ingredient, Recipe, PlannedMeal, ShoppingItem, ManualShoppingItem,
 import { initialIngredients, initialRecipes } from './initialData';
 import { initialNonFoodItems } from './initialNonFood';
 import { calculateShoppingList } from '../utils/shoppingCalculator';
+import { getRoomCode, saveToCloud } from '../utils/sync';
+import type { SyncData } from '../utils/sync';
 
 interface AppState {
   ingredients: Ingredient[];
@@ -14,6 +16,10 @@ interface AppState {
   manualShoppingItems: ManualShoppingItem[];
   nonFoodItems: NonFoodItem[];
   shoppingNonFood: ShoppingNonFoodItem[];
+
+  // Sync
+  syncStatus: 'idle' | 'saving' | 'loading' | 'error';
+  loadFromCloudData: (data: SyncData) => void;
 
   // Ingredients
   addIngredient: (ingredient: Omit<Ingredient, 'id'>) => string;
@@ -59,6 +65,19 @@ export const useStore = create<AppState>()(
       manualShoppingItems: [],
       nonFoodItems: initialNonFoodItems,
       shoppingNonFood: [],
+      syncStatus: 'idle' as const,
+
+      loadFromCloudData: (data: SyncData) =>
+        set({
+          ingredients: data.ingredients as Ingredient[],
+          recipes: data.recipes as Recipe[],
+          meals: data.meals as PlannedMeal[],
+          shoppingList: data.shoppingList as ShoppingItem[],
+          manualShoppingItems: data.manualShoppingItems as ManualShoppingItem[],
+          nonFoodItems: data.nonFoodItems as NonFoodItem[],
+          shoppingNonFood: data.shoppingNonFood as ShoppingNonFoodItem[],
+          syncStatus: 'idle' as const,
+        }),
 
       // --- Ingredients ---
       addIngredient: (ingredient) => {
@@ -299,3 +318,32 @@ export const useStore = create<AppState>()(
     }
   )
 );
+
+// Auto-sync to cloud on state changes (debounced)
+let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+const DATA_KEYS = ['ingredients', 'recipes', 'meals', 'shoppingList', 'manualShoppingItems', 'nonFoodItems', 'shoppingNonFood'] as const;
+
+useStore.subscribe((state, prevState) => {
+  const roomCode = getRoomCode();
+  if (!roomCode) return;
+
+  // Only sync if data actually changed (not syncStatus)
+  const changed = DATA_KEYS.some((key) => state[key] !== prevState[key]);
+  if (!changed) return;
+
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => {
+    const s = useStore.getState();
+    const data: SyncData = {
+      ingredients: s.ingredients,
+      recipes: s.recipes,
+      meals: s.meals,
+      shoppingList: s.shoppingList,
+      manualShoppingItems: s.manualShoppingItems,
+      nonFoodItems: s.nonFoodItems,
+      shoppingNonFood: s.shoppingNonFood,
+      lastModified: Date.now(),
+    };
+    saveToCloud(roomCode, data);
+  }, 1000);
+});

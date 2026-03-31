@@ -6,6 +6,7 @@ import RecipeList from './components/recipes/RecipeList';
 import WeekPlanning from './components/planning/WeekPlanning';
 import ShoppingList from './components/shopping/ShoppingList';
 import NonFoodList from './components/settings/NonFoodList';
+import SyncSettings from './components/settings/SyncSettings';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('recipes');
@@ -29,6 +30,8 @@ function App() {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800">Paramètres</h2>
               </div>
+              <SyncSettings />
+              <div className="border-t border-gray-200/60" />
               <IngredientList />
               <div className="border-t border-gray-200/60" />
               <NonFoodList />
